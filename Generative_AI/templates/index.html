@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Business Plan Text Generator</title>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1 class="sidebar-title">OldGPT</h1>
+            <ul class="sidebar-menu">
+                <li><button class="menu-item" onclick="createNewChat()">Create a new chat</button></li>
+                <li><button class="menu-item" onclick="goToGitHub()">GitHub</button></li>
+                <li><button class="menu-item" onclick="clearEverything()">Clear everything</button></li>
+            </ul>
+        </div>
+    
+        <div class="main-content">
+            <h1>Business Plan Text Generator</h1>
+            <div class="input-section">
+                <label for="model">Model</label>
+                <select id="model" class="input-field">
+                    <option value="gpt-2">gpt-2</option>
+                </select>
+                <label for="prompt">First message (required)</label>
+                <input type="text" id="prompt" class="input-field" placeholder="Enter a Business Plan-related prompt">
+                <button class="generate-btn" onclick="generateText()">Send</button>
+                <p id="error-message" class="error-message"></p>
+            </div>
+    
+            <!-- Loading Animation -->
+            <div id="loader" class="loader">
+                <span></span><span></span><span></span>
+            </div>
+    
+            <pre id="generated-text" class="generated-text"></pre>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p><span class="at-symbol">@</span> Developed by Salowe</p>
+    </footer>
+    
+    
+
+    <script>
+        // Function for generating text from prompt
+        async function generateText() {
+    const prompt = document.getElementById('prompt').value;
+    const errorMessage = document.getElementById('error-message');
+    const loader = document.getElementById('loader');
+    const generatedText = document.getElementById('generated-text');
+
+    errorMessage.textContent = ''; // Clear any previous error messages
+    generatedText.textContent = ''; // Clear previous generated text
+    loader.style.display = 'block'; // Show loading animation
+
+    if (!prompt.trim()) {
+        errorMessage.textContent = 'Please enter a prompt before generating text.';
+        loader.style.display = 'none'; // Hide loading animation
+        return;
+    }
+
+    try {
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        const data = await response.json();
+        generatedText.textContent = data.generated_text;
+    } catch (error) {
+        errorMessage.textContent = 'Failed to generate text. Please try again.';
+    } finally {
+        loader.style.display = 'none'; // Hide loading animation after text is generated
+    }
+}
+
+    </script>
+</body>
+</html>
